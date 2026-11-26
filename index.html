@@ -2415,7 +2415,7 @@ h1 b{font-weight:700;color:#7FB0FF}
   <div id="topo"></div>
   <div id="rec" hidden>● REC <span id="rect">0</span>s</div>
   <div id="num"></div>
-  <div id="montando" hidden><div class="spin"></div><p class="eyebrow">Nossa Safra 2026</p><h1>Montando seu <b>Boomerang...</b></h1><div class="bar2"><i id="mont-bar"></i></div></div>
+  <div id="montando" hidden><div class="spin"></div><p class="eyebrow">Nossa Safra 2026</p><h1 id="mont-tx-h">Montando seu <b>Boomerang</b></h1><p class="aviso" id="mont-tx">Montando...</p><div class="bar2"><i id="mont-bar"></i></div></div>
   <div id="ctrl">
     <div class="modos"><button id="m-foto" class="on">Foto</button><button id="m-video">Vídeo</button><button id="m-bum">Boomerang</button></div>
     <div class="modos tempos"><span>Contagem:</span><button id="t3">3s</button><button id="t5">5s</button><button id="t10" class="on">10s</button></div>
@@ -2734,7 +2734,7 @@ async function gravarVideo(){
     $("rec").hidden = true; $("ring").classList.remove("on");
     mostrarPrevia(recorder.blob(), "video");
   };
-  recorder.start();   // sem fatiar: MP4 inteiro, o Drive processa mais rápido
+  recorder.start(1000);
   gravando = true;
   let t = 0; $("rect").textContent = 0; $("rec").hidden = false;
   $("disparo").classList.add("parar"); $("disparo").textContent = "Parar gravação";
@@ -2756,19 +2756,26 @@ async function gravarBumerangue(){
     await new Promise(r => setTimeout(r, 1000 / FPS));
   }
   $("rec").hidden = true; $("ring").classList.remove("on");
-  $("montando").hidden = false; $("mont-bar").style.width = "0%";
+  $("montando").hidden = false; $("mont-bar").style.width = "0%"; $("mont-tx").textContent = "Montando...";
   const seq = frames.concat(frames.slice(1, -1).reverse());
   const c = document.createElement("canvas"); c.width = BW; c.height = BH;
   const g = c.getContext("2d");
   g.drawImage(seq[0], 0, 0);
   const audio = await audioGravacao(false);
   const rec = novoRecorder(c, audio);
-  rec.start();
+  rec.start(500);
   const total = VOLTAS * seq.length; let feito = 0;
   for(let v = 0; v < VOLTAS; v++){
-    for(const f of seq){ g.drawImage(f, 0, 0); feito++; $("mont-bar").style.width = Math.round(100 * feito / total) + "%"; await new Promise(r => setTimeout(r, 1000 / FPS)); }
+    for(const f of seq){ g.drawImage(f, 0, 0); feito++; $("mont-bar").style.width = Math.round(85 * feito / total) + "%"; await new Promise(r => setTimeout(r, 1000 / FPS)); }
   }
+  // finalização do arquivo: a barra continua andando até o iPhone terminar
+  $("mont-tx").textContent = "Finalizando...";
+  let pct = 85;
+  const fim = setInterval(() => { pct += (99 - pct) * 0.08; $("mont-bar").style.width = pct.toFixed(1) + "%"; }, 200);
   await new Promise(r => { rec.onstop = r; rec.stop(); });
+  clearInterval(fim);
+  $("mont-bar").style.width = "100%";
+  await new Promise(r => setTimeout(r, 250));
   audio.parar();
   $("disparo").disabled = false;
   $("montando").hidden = true;
