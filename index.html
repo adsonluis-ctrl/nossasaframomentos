@@ -2734,7 +2734,7 @@ async function gravarVideo(){
     $("rec").hidden = true; $("ring").classList.remove("on");
     mostrarPrevia(recorder.blob(), "video");
   };
-  recorder.start(1000);
+  recorder.start();   // sem fatiar: MP4 inteiro, o Drive processa mais rápido
   gravando = true;
   let t = 0; $("rect").textContent = 0; $("rec").hidden = false;
   $("disparo").classList.add("parar"); $("disparo").textContent = "Parar gravação";
@@ -2763,7 +2763,7 @@ async function gravarBumerangue(){
   g.drawImage(seq[0], 0, 0);
   const audio = await audioGravacao(false);
   const rec = novoRecorder(c, audio);
-  rec.start(500);
+  rec.start();
   const total = VOLTAS * seq.length; let feito = 0;
   for(let v = 0; v < VOLTAS; v++){
     for(const f of seq){ g.drawImage(f, 0, 0); feito++; $("mont-bar").style.width = Math.round(100 * feito / total) + "%"; await new Promise(r => setTimeout(r, 1000 / FPS)); }
