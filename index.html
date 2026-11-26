@@ -59,6 +59,17 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transfor
 </section>
 
 
+<section id="ola" hidden>
+  <p class="eyebrow">Nossa Safra 2026</p>
+  <h1>Olá, <b id="ola-nome"></b></h1>
+  <p class="aviso" style="font-size:20px">Vamos começar sua captura?</p>
+  <div class="acoes" style="flex-direction:column">
+    <button class="btn" id="iniciar">Começar captura</button>
+    <button class="btn sec" id="verqr">Ver meu QR code</button>
+    <button class="btn sec" id="naosou">Não sou eu</button>
+  </div>
+</section>
+
 <section id="cam" hidden>
   <video id="video" playsinline autoplay muted></video>
   <div id="topo"></div>
@@ -96,12 +107,12 @@ let pastas = [], atual = null, stream = null, fila = [], enviando = false, timer
 const imgs = {};
 
 function tela(id){
-  ["boas","home","cam","prev","fim"].forEach(s => $(s).hidden = s !== id);
+  ["boas","home","ola","cam","prev","fim"].forEach(s => $(s).hidden = s !== id);
   armarInativo(id);
 }
 function armarInativo(id){
   clearTimeout(inativo);
-  if(id === "home" || id === "prev") inativo = setTimeout(encerrar, TEMPO_INATIVO * 1000);
+  if(id === "home" || id === "ola" || id === "prev") inativo = setTimeout(encerrar, TEMPO_INATIVO * 1000);
 }
 
 function carregarImg(src){
@@ -143,8 +154,11 @@ $("busca").addEventListener("input", desenharLista);
 function escolher(p){
   atual = p;
   $("busca").blur();
-  contar();
+  $("ola-nome").textContent = p.nome.toUpperCase() + "!";
+  tela("ola");
 }
+$("iniciar").onclick = contar;
+$("naosou").onclick = () => { atual = null; tela("home"); };
 $("comecar").onclick = () => { abrirCamera().catch(()=>{}); tela("home"); };
 
 // ---------- câmera ----------
@@ -238,7 +252,9 @@ async function enviarFila(){
 window.addEventListener("beforeunload", e => { if(fila.length){ e.preventDefault(); e.returnValue = ""; } });
 
 // ---------- encerrar + QR ----------
-$("encerrar").onclick = () => {
+$("verqr").onclick = mostrarQR;
+$("encerrar").onclick = mostrarQR;
+function mostrarQR(){
   clearTimeout(inativo);
   $("fim-nome").textContent = atual.nome;
   const qr = qrcode(0, "M"); qr.addData(atual.link); qr.make();
@@ -248,7 +264,7 @@ $("encerrar").onclick = () => {
   $("fim-seg").textContent = "Voltando ao início em " + s + "s";
   clearInterval(timer);
   timer = setInterval(() => { s--; $("fim-seg").textContent = "Voltando ao início em " + s + "s"; if(s <= 0) encerrar(); }, 1000);
-};
+}
 $("pronto-fim").onclick = encerrar;
 
 function encerrar(){
