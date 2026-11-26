@@ -2354,6 +2354,10 @@ h1 b{font-weight:700;color:#7FB0FF}
 #contador{text-align:center;font-size:13px;color:rgba(255,255,255,.8);margin:-4px 0 10px}
 .big:disabled{opacity:.7}
 #sair{position:absolute;z-index:4;top:calc(10px + env(safe-area-inset-top));left:12px;font:inherit;font-size:16px;font-weight:600;color:#fff;background:rgba(0,0,0,.45);border:0;border-radius:999px;padding:10px 16px}
+#cam.livre .modos,#cam.livre .ic,#cam.livre #sair,#cam.livre #contador,#cam.livre #topo{display:none!important}
+#cam.livre #ctrl{background:none}
+#cam.livre .linha{justify-content:center}
+#cam.livre .big{flex:0 0 auto;padding:14px 26px;font-size:16px;opacity:.85}
 #montando{position:absolute;inset:0;z-index:5;background:#04163F;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .spin{width:56px;height:56px;border-radius:50%;border:5px solid rgba(127,176,255,.25);border-top-color:#7FB0FF;animation:gira 1s linear infinite;margin-bottom:28px}
 @keyframes gira{to{transform:rotate(360deg)}}
@@ -2549,7 +2553,7 @@ function resetarDisparo(){
   $("disparo").textContent = "Iniciar contagem";
   travar(false);
 }
-function travar(on){ ["m-foto","m-video","m-bum","virar","t3","t5","t10"].forEach(id => $(id).disabled = on); }
+function travar(on){ $("cam").classList.toggle("livre", on); ["m-foto","m-video","m-bum","virar","t3","t5","t10"].forEach(id => $(id).disabled = on); }
 
 [3,5,10].forEach(n => $("t" + n).onclick = () => {
   SEGUNDOS = n;
